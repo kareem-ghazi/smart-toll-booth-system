@@ -64,7 +64,7 @@ venv.bak/
 # Deep Learning / Data Science
 *.h5
 *.keras
-*.pt
+yolo26n.pt
 *.pth
 datasets/
 data/
@@ -89,3 +89,6 @@ instance/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+src/model/runs/
+_archive/

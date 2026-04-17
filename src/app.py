@@ -1,5 +1,8 @@
 import streamlit as st
 import pandas as pd
+import cv2
+import numpy as np
+from PIL import Image
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -38,38 +41,67 @@ left_col, right_col = st.columns([1.2, 1.5], gap="large")
 with left_col:
     st.subheader("Camera / Upload Feed")
     
+    # 1. Initialize session state to store the captured image
+    if 'captured_frame' not in st.session_state:
+        st.session_state.captured_frame = None
+
     # Upload & Live Feed Controls
     uploaded_file = st.file_uploader("Upload Video/Image", type=["mp4", "avi", "jpg", "png"])
-    live_feed = st.checkbox("Enable Live Feed")
-    
+    live_feed = st.checkbox("Enable Camera", key='live_feed')
+
     # Simulated Video Frame / AI Detection Window
     video_container = st.container(border=True)
+
+    # 1. Define a function to turn off the camera
+    def stop_camera():
+        st.session_state['live_feed'] = False
+
     with video_container:
-        if live_feed or uploaded_file:
-            # Simulate the "Scanning..." and "Plate Detected" overlay
-            # Removed the inner background-color to fix the nested box issue
-            st.markdown("""
-                <div style='padding: 100px 20px; text-align: center;'>
-                    <span style='background-color: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; position: absolute; top: 10px; right: 10px; font-size: 0.8em;'>Scanning...</span>
-                    <div style='border: 2px solid #00FF00; display: inline-block; padding: 20px; position: relative;'>
-                        <span style='background-color: #00FF00; color: black; padding: 2px 8px; font-size: 0.8em; font-weight: bold; position: absolute; top: -25px; left: -2px;'>Plate Detected: ABC-123 (Confidence: 98%)</span>
-                        <h2 style='margin: 0; color: white;'>ABC-123</h2>
-                    </div>
-                </div>
-            """, unsafe_allow_html=True)
+        # 1. LIVE CAMERA FEED
+        if live_feed:
+            camera_index = 0
+            cap = cv2.VideoCapture(camera_index, cv2.CAP_DSHOW)
+            frame_placeholder = st.empty()
+            st.button("Capture Photo", on_click=stop_camera)
+            
+            try:
+                while cap.isOpened() and st.session_state.get('live_feed', True):
+                    ret, frame = cap.read()
+                    if not ret: break
+                    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    frame_placeholder.image(frame_rgb, channels="RGB", width='stretch')
+                    
+                    # Constantly update state so we have the "last seen" frame
+                    st.session_state.captured_frame = frame_rgb
+            finally:
+                cap.release()
+
+        # 2. UPLOADED FILE DISPLAY (Priority over static captures)
+        elif uploaded_file is not None:
+            file_type = uploaded_file.type.split('/')[0]
+            if file_type == 'image':
+                img = Image.open(uploaded_file)
+                st.image(img, caption="Uploaded Image", width='stretch')
+            elif file_type == 'video':
+                st.video(uploaded_file)
+
+        # 3. CAPTURED IMAGE DISPLAY
+        elif st.session_state.captured_frame is not None:
+            st.image(st.session_state.captured_frame, caption="Captured Frame", width='stretch')
+            if st.button("Clear Capture"):
+                st.session_state.captured_frame = None
+                st.rerun()
+
+        # 4. EMPTY STATE
         else:
-            # Removed the inner background-color so it uses the container's native boundary seamlessly
             st.markdown("""
                 <div style='padding: 120px 20px; text-align: center; color: gray;'>
                     <i>Awaiting video feed or file upload...</i>
                 </div>
             """, unsafe_allow_html=True)
     
-    st.write("") # Spacer
-    
-    # Progress Bar & Process Button
-    st.progress(45)
-    st.button("Process Media", type="primary", use_container_width=True)
+    # Process Button
+    st.button("Process Media", type="primary", width='stretch')
 
 # ==========================================
 # RIGHT COLUMN: DATABASE RECORDS
@@ -95,7 +127,6 @@ with right_col:
     # Data Table Display
     st.dataframe(
         filtered_df,
-        use_container_width=True,
+        width='stretch',
         hide_index=True
-        # Removed `height=400` here so the table fits the data exactly without blank rows
     )
