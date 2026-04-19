@@ -14,7 +14,15 @@ def finetune_character_model(data_yaml_path, model_variant='yolo26n.pt', epochs=
         data=data_yaml_path,
         epochs=epochs,
         imgsz=imgsz,
-        plots=True
+        plots=True,
+        batch=32,              # 'Batch size'
+        degrees=10.0,          # Handles tilted plates
+        shear=2.0,             # Handles perspective distortion
+        perspective=0.0001,    # Subtle perspective shifts
+        flipud=0.0,            # Never flip Arabic text upside down!
+        fliplr=0.0,            # Never flip Arabic text left-to-right!
+        mosaic=1.0,            # Mixes images to help with context
+        mixup=0.1,             # Helps the model distinguish similar characters
     )
     
     # Save the model
@@ -74,7 +82,7 @@ if __name__ == "__main__":
     output_image = os.path.join(project_root, 'src', 'data', 'character_detection_result.jpg')
     
     # Finetune for 20 epochs
-    model, _ = finetune_character_model(data_yaml, epochs=20)
+    model, _ = finetune_character_model(data_yaml, epochs=150)
     
     # Test
     if os.path.exists(test_image):

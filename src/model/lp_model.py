@@ -14,7 +14,12 @@ def finetune_yolo(data_yaml_path, model_variant='yolo26n.pt', epochs=10, imgsz=6
         data=data_yaml_path,
         epochs=epochs,
         imgsz=imgsz,
-        plots=True
+        plots=True,
+        batch=32,              # 'Batch size'
+        degrees=10.0,          # Handles tilted plates
+        shear=2.0,             # Handles perspective distortion
+        perspective=0.0001,    # Subtle perspective shifts
+        mosaic=1.0,            # Mixes images to help with context
     )
     
     # Save the model
@@ -50,7 +55,7 @@ if __name__ == "__main__":
     
     # Finetune
     # Using 1 epoch for quick demonstration, increase as needed
-    model, train_results = finetune_yolo(data_yaml, epochs=10)
+    model, train_results = finetune_yolo(data_yaml, epochs=100)
     
     # Test
     if os.path.exists(test_image):
