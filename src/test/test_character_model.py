@@ -6,7 +6,7 @@ from ultralytics import YOLO
 def test_character_model():
     # Paths
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-    model_path = os.path.join(project_root, 'src', 'model', 'outputs', 'character_model (150-diffparm).pt')
+    model_path = os.path.join(project_root, 'src', 'model', 'outputs', 'character_model.pt')
     data_yaml_path = os.path.join(project_root, 'src', 'data', 'processed_plates', 'data.yaml')
     test_images_dir = os.path.join(project_root, 'src', 'data', 'processed_plates', 'test', 'images')
     output_dir = os.path.join(project_root, 'src', 'test', 'output', 'character_model_results')

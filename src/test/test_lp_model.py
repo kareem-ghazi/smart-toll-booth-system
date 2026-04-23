@@ -6,7 +6,7 @@ from ultralytics import YOLO
 def test_lp_model():
     # Paths
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-    model_path = os.path.join(project_root, 'src', 'model', 'outputs', 'lp_model (100-diffdiffparam).pt')
+    model_path = os.path.join(project_root, 'src', 'model', 'outputs', 'lp_model.pt')
     data_yaml_path = os.path.join(project_root, 'src', 'data', 'processed_vehicles', 'data.yaml')
     test_images_dir = os.path.join(project_root, 'src', 'data', 'processed_vehicles', 'test', 'images')
     output_dir = os.path.join(project_root, 'src', 'test', 'output', 'lp_model_results')

@@ -3,6 +3,7 @@ import pandas as pd
 import cv2
 import numpy as np
 from PIL import Image
+from manager import manager
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -41,9 +42,15 @@ left_col, right_col = st.columns([1.2, 1.5], gap="large")
 with left_col:
     st.subheader("Camera / Upload Feed")
     
-    # 1. Initialize session state to store the captured image
+    # 1. Initialize session state to store the captured image and results
     if 'captured_frame' not in st.session_state:
         st.session_state.captured_frame = None
+    if 'detected_plate_img' not in st.session_state:
+        st.session_state.detected_plate_img = None
+    if 'detected_text' not in st.session_state:
+        st.session_state.detected_text = None
+    if 'plate_aspect_ratio' not in st.session_state:
+        st.session_state.plate_aspect_ratio = 3/1
 
     # Upload & Live Feed Controls
     uploaded_file = st.file_uploader("Upload Video/Image", type=["mp4", "avi", "jpg", "png"])
@@ -82,14 +89,20 @@ with left_col:
             if file_type == 'image':
                 img = Image.open(uploaded_file)
                 st.image(img, caption="Uploaded Image", width='stretch')
+                # Convert PIL to numpy for processing
+                st.session_state.current_image = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
             elif file_type == 'video':
                 st.video(uploaded_file)
 
         # 3. CAPTURED IMAGE DISPLAY
         elif st.session_state.captured_frame is not None:
             st.image(st.session_state.captured_frame, caption="Captured Frame", width='stretch')
+            # Convert RGB (from session state) to BGR for processing
+            st.session_state.current_image = cv2.cvtColor(st.session_state.captured_frame, cv2.COLOR_RGB2BGR)
             if st.button("Clear Capture"):
                 st.session_state.captured_frame = None
+                st.session_state.detected_plate_img = None
+                st.session_state.detected_text = None
                 st.rerun()
 
         # 4. EMPTY STATE
@@ -101,12 +114,70 @@ with left_col:
             """, unsafe_allow_html=True)
     
     # Process Button
-    st.button("Process Media", type="primary", width='stretch')
+    if st.button("Process Media", type="primary", width='stretch'):
+        if 'current_image' in st.session_state:
+            with st.spinner("Processing..."):
+                # 1. Detect and crop plate
+                cropped_plate, _ = manager.detect_and_crop_plate(st.session_state.current_image)
+                
+                if cropped_plate is not None:
+                    # Store cropped plate (convert to RGB for display)
+                    st.session_state.detected_plate_img = cv2.cvtColor(cropped_plate, cv2.COLOR_BGR2RGB)
+                    
+                    # Calculate aspect ratio for the container to match image size
+                    h, w = cropped_plate.shape[:2]
+                    st.session_state.plate_aspect_ratio = w / h
+                    
+                    # 2. Extract text
+                    st.session_state.detected_text = manager.extract_text_from_plate(cropped_plate)
+                else:
+                    st.error("No license plate detected.")
+                    st.session_state.detected_plate_img = None
+                    st.session_state.detected_text = None
 
 # ==========================================
 # RIGHT COLUMN: DATABASE RECORDS
 # ==========================================
 with right_col:
+    # --- Detection Results Area ---
+    if st.session_state.detected_plate_img is not None:
+        st.subheader("Detection Result")
+        res_col1, res_col2 = st.columns([1, 1], gap="medium", vertical_alignment="top")
+        with res_col1:
+            # We use a container to help with alignment if needed, but st.image is usually fine
+            st.image(st.session_state.detected_plate_img, caption="Cropped License Plate", width='stretch')
+        with res_col2:
+            # Using dynamic aspect-ratio to match the actual cropped image size
+            aspect_ratio = st.session_state.get('plate_aspect_ratio', 3/1)
+            st.markdown(
+                f"""
+                <div style="
+                    background-color: #0e1117; 
+                    width: 100%; 
+                    aspect-ratio: {aspect_ratio}; 
+                    border-radius: 12px; 
+                    border: 2px solid #31333f; 
+                    display: flex; 
+                    justify-content: center; 
+                    align-items: center; 
+                    margin-bottom: 8px;
+                ">
+                    <h1 style="
+                        color: white; 
+                        margin: 0; 
+                        font-size: 2.5vw; 
+                        font-family: 'Courier New', Courier, monospace; 
+                        letter-spacing: 0.5vw;
+                        text-align: center;
+                        direction: rtl;
+                    ">{st.session_state.detected_text}</h1>
+                </div>
+                <p style="text-align: center; color: #808495; font-size: 14px; margin-top: 0px; margin-bottom: 25px;">Detected Characters</p>
+                """,
+                unsafe_allow_html=True
+            )
+        st.markdown("---")
+
     st.subheader("Database Records (Toll Info)")
     
     # Controls row: Button and Search Bar
