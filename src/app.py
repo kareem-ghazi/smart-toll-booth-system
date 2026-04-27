@@ -3,7 +3,8 @@ import pandas as pd
 import cv2
 import numpy as np
 from PIL import Image
-from manager import manager
+# Assuming manager is a local module
+from manager import manager 
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -12,6 +13,41 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed"
 )
+
+# --- Custom Styling for Padding & Alignment ---
+st.markdown("""
+    <style>
+        /* 1. Reduce vertical gap between all elements */
+        [data-testid="stVerticalBlock"] > div {
+            gap: 0.1rem !important;
+        }
+        
+        /* 2. Center the "of X" text vertically with the input box */
+        .counter-text {
+            display: flex;
+            align-items: center;
+            height: 38px;
+            margin: 0;
+            font-size: 1.1em;
+            color: #FAFAFA;
+        }
+
+        /* 3. Tighten the caption area (Blue Area) */
+        .file-caption {
+            text-align: center; 
+            color: #808495; 
+            margin-top: 5px !important;
+            margin-bottom: 5px !important; 
+            font-size: 0.9em;
+        }
+
+        /* 4. Ensure images are centered */
+        div[data-testid="stImage"] {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 # --- Dummy Data for Database ---
 @st.cache_data
@@ -42,133 +78,42 @@ left_col, right_col = st.columns([1.2, 1.5], gap="large")
 with left_col:
     st.subheader("Camera / Upload Feed")
     
-    # 1. Initialize session state to store the captured image and results
-    if 'captured_frame' not in st.session_state:
-        st.session_state.captured_frame = None
-    if 'image_results' not in st.session_state:
-        st.session_state.image_results = {}
-    if 'current_index' not in st.session_state:
-        st.session_state.current_index = 0
-    if 'detected_plate_img' not in st.session_state:
-        st.session_state.detected_plate_img = None
-    if 'detected_text' not in st.session_state:
-        st.session_state.detected_text = None
-    if 'plate_aspect_ratio' not in st.session_state:
-        st.session_state.plate_aspect_ratio = 3/1
+    # Initialize session states
+    if 'current_index' not in st.session_state: st.session_state.current_index = 0
+    if 'image_results' not in st.session_state: st.session_state.image_results = {}
+    if 'captured_frame' not in st.session_state: st.session_state.captured_frame = None
+    if 'detected_plate_img' not in st.session_state: st.session_state.detected_plate_img = None
+    if 'detected_text' not in st.session_state: st.session_state.detected_text = None
+    if 'plate_aspect_ratio' not in st.session_state: st.session_state.plate_aspect_ratio = 3/1
+    if 'uploader_key' not in st.session_state: st.session_state.uploader_key = 0
 
     def reset_index():
         st.session_state.current_index = 0
+        if 'nav_jump' in st.session_state:
+            st.session_state.nav_jump = 1
 
-    # Upload & Live Feed Controls
-    uploaded_files = st.file_uploader("Upload Video/Images", type=["mp4", "avi", "jpg", "png"], accept_multiple_files=True, on_change=reset_index)
-    live_feed = st.checkbox("Enable Camera", key='live_feed')
-
-    # Simulated Video Frame / AI Detection Window
-    video_container = st.container(border=True)
-
-    # 1. Define a function to turn off the camera
-    def stop_camera():
-        st.session_state['live_feed'] = False
-
-    with video_container:
-        # Centering images within the container
-        st.markdown("""
-            <style>
-                div[data-testid="stImage"] {
-                    display: flex;
-                    justify-content: center;
-                }
-                div[data-testid="stImageCaption"] {
-                    text-align: center;
-                    width: 100%;
-                }
-            </style>
-        """, unsafe_allow_html=True)
-
-        # 1. LIVE CAMERA FEED
-        if live_feed:
-            camera_index = 0
-            cap = cv2.VideoCapture(camera_index, cv2.CAP_DSHOW)
-            frame_placeholder = st.empty()
-            st.button("Capture Photo", on_click=stop_camera)
-            
-            try:
-                while cap.isOpened() and st.session_state.get('live_feed', True):
-                    ret, frame = cap.read()
-                    if not ret: break
-                    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    frame_placeholder.image(frame_rgb, channels="RGB", width='stretch')
-                    
-                    # Constantly update state so we have the "last seen" frame
-                    st.session_state.captured_frame = frame_rgb
-            finally:
-                cap.release()
-
-        # 2. UPLOADED FILE DISPLAY (Priority over static captures)
-        elif uploaded_files:
-            if st.session_state.current_index >= len(uploaded_files):
-                st.session_state.current_index = 0
-            
-            current_file = uploaded_files[st.session_state.current_index]
-            file_type = current_file.type.split('/')[0]
-            
-            if file_type == 'image':
-                img = Image.open(current_file)
-                st.image(img, caption=f"Uploaded Image: {current_file.name}", width='stretch')
-                # Convert PIL to numpy for processing
-                st.session_state.current_image = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
-            elif file_type == 'video':
-                st.video(current_file)
-                st.session_state.current_image = None
-
-            # Navigation Arrows
-            if len(uploaded_files) > 1:
-                nav_col1, nav_col2, nav_col3 = st.columns([1, 2, 1])
-                with nav_col1:
-                    if st.button("⬅️ Previous", width='stretch'):
-                        st.session_state.current_index = (st.session_state.current_index - 1) % len(uploaded_files)
-                        st.rerun()
-                with nav_col2:
-                    st.markdown(f"<p style='text-align: center; line-height: 2.5;'>{st.session_state.current_index + 1} of {len(uploaded_files)}</p>", unsafe_allow_html=True)
-                with nav_col3:
-                    if st.button("Next ➡️", width='stretch'):
-                        st.session_state.current_index = (st.session_state.current_index + 1) % len(uploaded_files)
-                        st.rerun()
-
-            # Update detection results from cache for the current file
-            if current_file.name in st.session_state.image_results:
-                res = st.session_state.image_results[current_file.name]
-                st.session_state.detected_plate_img = res.get('detected_plate_img')
-                st.session_state.detected_text = res.get('detected_text')
-                st.session_state.plate_aspect_ratio = res.get('plate_aspect_ratio', 3/1)
-                if st.session_state.detected_plate_img is None:
-                    st.warning("No license plate detected in this image.")
-            else:
-                st.session_state.detected_plate_img = None
-                st.session_state.detected_text = None
-
-        # 3. CAPTURED IMAGE DISPLAY
-        elif st.session_state.captured_frame is not None:
-            st.image(st.session_state.captured_frame, caption="Captured Frame", width='stretch')
-            # Convert RGB (from session state) to BGR for processing
-            st.session_state.current_image = cv2.cvtColor(st.session_state.captured_frame, cv2.COLOR_RGB2BGR)
-            if st.button("Clear Capture"):
-                st.session_state.captured_frame = None
-                st.session_state.detected_plate_img = None
-                st.session_state.detected_text = None
-                st.session_state.image_results = {}
-                st.rerun()
-
-        # 4. EMPTY STATE
-        else:
-            st.markdown("""
-                <div style='padding: 120px 20px; text-align: center; color: gray;'>
-                    <i>Awaiting video feed or file upload...</i>
-                </div>
-            """, unsafe_allow_html=True)
+    uploaded_files = st.file_uploader("Upload Video/Images", type=["mp4", "avi", "jpg", "png"], 
+                                      accept_multiple_files=True, on_change=reset_index, 
+                                      key=f"uploader_{st.session_state.uploader_key}")
     
-    # Process Button
-    if st.button("Process Media", type="primary", width='stretch'):
+    col_proc, col_clear = st.columns([2, 1])
+    with col_proc:
+        process_btn = st.button("Process Media", type="primary", width='stretch')
+    with col_clear:
+        if st.button("🗑️ Remove All", width='stretch'):
+            st.session_state.uploader_key += 1
+            st.session_state.image_results = {}
+            st.session_state.current_index = 0
+            st.session_state.detected_plate_img = None
+            st.session_state.detected_text = None
+            if 'nav_jump' in st.session_state:
+                st.session_state.nav_jump = 1
+            st.rerun()
+
+    live_feed = st.checkbox("Enable Camera", key='live_feed_toggle')
+
+    # Process Logic
+    if process_btn:
         if uploaded_files:
             with st.spinner(f"Processing {len(uploaded_files)} files..."):
                 for f in uploaded_files:
@@ -185,89 +130,100 @@ with left_col:
                             }
                         else:
                             st.session_state.image_results[f.name] = {
-                                'detected_plate_img': None,
-                                'detected_text': "No Plate Detected",
-                                'plate_aspect_ratio': 3/1
+                                'detected_plate_img': None, 'detected_text': "No Plate Detected", 'plate_aspect_ratio': 3/1
                             }
                 st.rerun()
-        elif st.session_state.captured_frame is not None:
-            with st.spinner("Processing Capture..."):
-                img_bgr = cv2.cvtColor(st.session_state.captured_frame, cv2.COLOR_RGB2BGR)
-                cropped_plate, _ = manager.detect_and_crop_plate(img_bgr)
+
+    # Video/Image Container
+    video_container = st.container(border=True)
+    with video_container:
+        # 1. LIVE CAMERA
+        if live_feed:
+            cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+            frame_placeholder = st.empty()
+            if st.button("Capture Photo"): st.session_state.live_feed_toggle = False
+            
+            while cap.isOpened() and st.session_state.get('live_feed_toggle', True):
+                ret, frame = cap.read()
+                if not ret: break
+                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                frame_placeholder.image(frame_rgb, width='stretch')
+                st.session_state.captured_frame = frame_rgb
+            cap.release()
+
+        # 2. UPLOADED FILE DISPLAY (Navigation + Logic)
+        elif uploaded_files:
+            # Navigation Bar (5-Column Layout to center the counter)
+            if len(uploaded_files) > 1:
+                def move_index(delta):
+                    st.session_state.current_index = (st.session_state.current_index + delta) % len(uploaded_files)
+                    st.session_state.nav_jump = st.session_state.current_index + 1
+
+                n_c1, n_c2, n_c3, n_c4 = st.columns([0.7, 0.25, 0.25, 0.7], gap="small")
                 
-                if cropped_plate is not None:
-                    st.session_state.detected_plate_img = cv2.cvtColor(cropped_plate, cv2.COLOR_BGR2RGB)
-                    h, w = cropped_plate.shape[:2]
-                    st.session_state.plate_aspect_ratio = w / h
-                    st.session_state.detected_text = manager.extract_text_from_plate(cropped_plate)
+                with n_c1:
+                    st.button("⬅️ Previous", width='stretch', on_click=move_index, args=(-1,))
+                
+                with n_c2:
+                    def sync_index(): st.session_state.current_index = st.session_state.nav_jump - 1
+                    st.number_input("Idx", 1, len(uploaded_files), value=int(st.session_state.current_index + 1), 
+                                    key="nav_jump", on_change=sync_index, label_visibility="collapsed")
+                
+                with n_c3:
+                    st.markdown(f"<div class='counter-text'>of {len(uploaded_files)}</div>", unsafe_allow_html=True)
+                
+                with n_c4:
+                    st.button("Next ➡️", width='stretch', on_click=move_index, args=(1,))
+
+            current_file = uploaded_files[st.session_state.current_index]
+            st.markdown(f"<p class='file-caption'>Uploaded Image: {current_file.name}</p>", unsafe_allow_html=True)
+
+            if current_file.type.startswith('image'):
+                img = Image.open(current_file)
+                st.image(img, width='stretch')
+                
+                # Update Detection Results for this specific image
+                if current_file.name in st.session_state.image_results:
+                    res = st.session_state.image_results[current_file.name]
+                    st.session_state.detected_plate_img = res['detected_plate_img']
+                    st.session_state.detected_text = res['detected_text']
+                    st.session_state.plate_aspect_ratio = res['plate_aspect_ratio']
                 else:
-                    st.error("No license plate detected.")
                     st.session_state.detected_plate_img = None
-                    st.session_state.detected_text = None
+
+        elif st.session_state.captured_frame is not None:
+            st.image(st.session_state.captured_frame, caption="Captured Frame")
+            if st.button("Clear Capture"):
+                st.session_state.captured_frame = None
+                st.rerun()
+        else:
+            st.markdown("<div style='padding:100px; text-align:center; color:gray;'>Awaiting media...</div>", unsafe_allow_html=True)
 
 # ==========================================
-# RIGHT COLUMN: DATABASE RECORDS
+# RIGHT COLUMN: DATABASE & RESULTS
 # ==========================================
 with right_col:
     st.subheader("Database Records (Toll Info)")
+    c1, c2 = st.columns([1, 2])
+    with c1: st.button("Switch Table", width='stretch')
+    with c2: search = st.text_input("Search", placeholder="🔍 Search Plate...", label_visibility="collapsed")
     
-    # Controls row: Button and Search Bar
-    control_col1, control_col2 = st.columns([1, 2])
-    
-    with control_col1:
-        st.button("Switch Database Table")
-        
-    with control_col2:
-        search_query = st.text_input("Search", placeholder="🔍 Search License Plate...", label_visibility="collapsed")
-    
-    # Filter data based on search
-    if search_query:
-        filtered_df = df[df["License Plate"].str.contains(search_query.upper())]
-    else:
-        filtered_df = df
-        
-    # Data Table Display
-    st.dataframe(
-        filtered_df,
-        width='stretch',
-        hide_index=True
-    )
+    filtered_df = df[df["License Plate"].str.contains(search.upper())] if search else df
+    st.dataframe(filtered_df, width='stretch', hide_index=True)
 
-    # --- Detection Results Area ---
     if st.session_state.detected_plate_img is not None:
         st.markdown("---")
         st.subheader("Detection Result")
-        res_col1, res_col2 = st.columns([1, 1], gap="medium", vertical_alignment="top")
+        res_col1, res_col2 = st.columns([1, 1], gap="medium")
         with res_col1:
-            # We use a container to help with alignment if needed, but st.image is usually fine
-            st.image(st.session_state.detected_plate_img, caption="Cropped License Plate", width='stretch')
+            st.image(st.session_state.detected_plate_img, caption="Cropped Plate", width='stretch')
         with res_col2:
-            # Using dynamic aspect-ratio to match the actual cropped image size
-            aspect_ratio = st.session_state.get('plate_aspect_ratio', 3/1)
-            st.markdown(
-                f"""
-                <div style="
-                    background-color: #0e1117; 
-                    width: 100%; 
-                    aspect-ratio: {aspect_ratio}; 
-                    border-radius: 12px; 
-                    border: 2px solid #31333f; 
-                    display: flex; 
-                    justify-content: center; 
-                    align-items: center; 
-                    margin-bottom: 8px;
-                ">
-                    <h1 style="
-                        color: white; 
-                        margin: 0; 
-                        font-size: 2.5vw; 
-                        font-family: 'Courier New', Courier, monospace; 
-                        letter-spacing: 0.5vw;
-                        text-align: center;
-                        direction: rtl;
-                    ">{st.session_state.detected_text}</h1>
+            st.markdown(f"""
+                <div style="background:#0e1117; width:100%; aspect-ratio:{st.session_state.plate_aspect_ratio}; 
+                border-radius:12px; border:2px solid #31333f; display:flex; justify-content:center; align-items:center;">
+                    <h1 style="color:white; font-size:2.5vw; font-family:monospace; letter-spacing:0.5vw; direction:rtl;">
+                        {st.session_state.detected_text}
+                    </h1>
                 </div>
-                <p style="text-align: center; color: #808495; font-size: 14px; margin-top: 0px; margin-bottom: 25px;">Detected Characters</p>
-                """,
-                unsafe_allow_html=True
-            )
+                <p style="text-align:center; color:#808495; font-size:14px; margin-top:5px;">Detected Characters</p>
+            """, unsafe_allow_html=True)
