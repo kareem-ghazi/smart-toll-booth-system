@@ -71,6 +71,20 @@ with left_col:
         st.session_state['live_feed'] = False
 
     with video_container:
+        # Centering images within the container
+        st.markdown("""
+            <style>
+                div[data-testid="stImage"] {
+                    display: flex;
+                    justify-content: center;
+                }
+                div[data-testid="stImageCaption"] {
+                    text-align: center;
+                    width: 100%;
+                }
+            </style>
+        """, unsafe_allow_html=True)
+
         # 1. LIVE CAMERA FEED
         if live_feed:
             camera_index = 0
