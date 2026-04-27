@@ -195,8 +195,33 @@ with left_col:
 # RIGHT COLUMN: DATABASE RECORDS
 # ==========================================
 with right_col:
+    st.subheader("Database Records (Toll Info)")
+    
+    # Controls row: Button and Search Bar
+    control_col1, control_col2 = st.columns([1, 2])
+    
+    with control_col1:
+        st.button("Switch Database Table")
+        
+    with control_col2:
+        search_query = st.text_input("Search", placeholder="🔍 Search License Plate...", label_visibility="collapsed")
+    
+    # Filter data based on search
+    if search_query:
+        filtered_df = df[df["License Plate"].str.contains(search_query.upper())]
+    else:
+        filtered_df = df
+        
+    # Data Table Display
+    st.dataframe(
+        filtered_df,
+        width='stretch',
+        hide_index=True
+    )
+
     # --- Detection Results Area ---
     if st.session_state.detected_plate_img is not None:
+        st.markdown("---")
         st.subheader("Detection Result")
         res_col1, res_col2 = st.columns([1, 1], gap="medium", vertical_alignment="top")
         with res_col1:
@@ -232,28 +257,3 @@ with right_col:
                 """,
                 unsafe_allow_html=True
             )
-        st.markdown("---")
-
-    st.subheader("Database Records (Toll Info)")
-    
-    # Controls row: Button and Search Bar
-    control_col1, control_col2 = st.columns([1, 2])
-    
-    with control_col1:
-        st.button("Switch Database Table")
-        
-    with control_col2:
-        search_query = st.text_input("Search", placeholder="🔍 Search License Plate...", label_visibility="collapsed")
-    
-    # Filter data based on search
-    if search_query:
-        filtered_df = df[df["License Plate"].str.contains(search_query.upper())]
-    else:
-        filtered_df = df
-        
-    # Data Table Display
-    st.dataframe(
-        filtered_df,
-        width='stretch',
-        hide_index=True
-    )
