@@ -3,8 +3,9 @@ import pandas as pd
 import cv2
 import numpy as np
 from PIL import Image
-# Assuming manager is a local module
-from manager import manager 
+import random
+from manager import manager
+from database import db_manager
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -49,48 +50,66 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- Dummy Data for Database ---
-@st.cache_data
-def load_dummy_data():
-    return pd.DataFrame({
-        "License Plate": ["ABC-123", "ABC-123", "ABC-123", "ABC-123", "ABC-127", "ABC-126", "ABC-134", "ABC-124"],
-        "Car Type": ["Sedan", "Sedan", "Sedan", "Sedan", "Sedan", "Medium", "Sedan", "Sedan"],
-        "Toll Fee ($)": ["$5.00", "$5.00", "$5.00", "$5.00", "$5.00", "$5.00", "$4.00", "$5.00"],
-        "Timestamp": [
-            "2024-05-15 10:32:01", "2024-05-15 10:32:01", "2024-05-15 10:32:01", 
-            "2024-05-15 10:32:01", "2024-05-15 10:32:09", "2024-05-15 10:32:08", 
-            "2024-05-15 10:32:01", "2024-05-15 10:32:03"
-        ]
-    })
+# --- Session State Initialization ---
+if 'view_table' not in st.session_state:
+    st.session_state.view_table = "Logs"
+if 'captured_frame' not in st.session_state:
+    st.session_state.captured_frame = None
+if 'image_results' not in st.session_state:
+    st.session_state.image_results = {}
+if 'current_index' not in st.session_state:
+    st.session_state.current_index = 0
+if 'detected_plate_img' not in st.session_state:
+    st.session_state.detected_plate_img = None
+if 'detected_text' not in st.session_state:
+    st.session_state.detected_text = None
+if 'plate_aspect_ratio' not in st.session_state:
+    st.session_state.plate_aspect_ratio = 3/1
+if 'uploader_key' not in st.session_state:
+    st.session_state.uploader_key = 0
+if 'nav_jump' not in st.session_state:
+    st.session_state.nav_jump = 1
 
-df = load_dummy_data()
+# --- Constants for Randomization ---
+FEES = [10.0, 15.0, 20.0, 25.0]
+CAR_TYPES = ["Sedan", "Off-road", "Hatchback", "Pickup", "Van", "Sport", "SUV"]
+
+# --- Database Loading Logic ---
+def load_data():
+    try:
+        if st.session_state.view_table == "Logs":
+            df = db_manager.get_recent_logs()
+            if not df.empty:
+                df.columns = ["License Plate", "Car Type", "Fee ($)", "Timestamp"]
+            return df
+        elif st.session_state.view_table == "Cars":
+            df = db_manager.get_all_cars()
+            if not df.empty:
+                df.columns = ["License Plate", "Type", "Passes", "Total Fees ($)"]
+            return df
+        elif st.session_state.view_table == "Drivers":
+            df = db_manager.get_all_drivers()
+            if not df.empty:
+                df.columns = ["NID", "Full Name", "Phone", "Plate", "Last Update"]
+            return df
+    except Exception as e:
+        st.error(f"Table Error: {e}")
+    return pd.DataFrame()
+
+df = load_data()
 
 # --- Main Title ---
 st.title("Smart Toll Booth Detection System")
 st.markdown("---")
 
-# --- Two-Column Layout ---
 left_col, right_col = st.columns([1.2, 1.5], gap="large")
 
-# ==========================================
-# LEFT COLUMN: CAMERA / UPLOAD FEED
-# ==========================================
 with left_col:
     st.subheader("Camera / Upload Feed")
     
-    # Initialize session states
-    if 'current_index' not in st.session_state: st.session_state.current_index = 0
-    if 'image_results' not in st.session_state: st.session_state.image_results = {}
-    if 'captured_frame' not in st.session_state: st.session_state.captured_frame = None
-    if 'detected_plate_img' not in st.session_state: st.session_state.detected_plate_img = None
-    if 'detected_text' not in st.session_state: st.session_state.detected_text = None
-    if 'plate_aspect_ratio' not in st.session_state: st.session_state.plate_aspect_ratio = 3/1
-    if 'uploader_key' not in st.session_state: st.session_state.uploader_key = 0
-
     def reset_index():
         st.session_state.current_index = 0
-        if 'nav_jump' in st.session_state:
-            st.session_state.nav_jump = 1
+        st.session_state.nav_jump = 1
 
     uploaded_files = st.file_uploader("Upload Video/Images", type=["mp4", "avi", "jpg", "png"], 
                                       accept_multiple_files=True, on_change=reset_index, 
@@ -106,8 +125,7 @@ with left_col:
             st.session_state.current_index = 0
             st.session_state.detected_plate_img = None
             st.session_state.detected_text = None
-            if 'nav_jump' in st.session_state:
-                st.session_state.nav_jump = 1
+            st.session_state.nav_jump = 1
             st.rerun()
 
     live_feed = st.checkbox("Enable Camera", key='live_feed_toggle')
@@ -115,24 +133,42 @@ with left_col:
     # Process Logic
     if process_btn:
         if uploaded_files:
-            with st.spinner(f"Processing {len(uploaded_files)} files..."):
+            with st.spinner("Processing..."):
                 for f in uploaded_files:
                     if f.type.startswith('image/'):
                         img = Image.open(f)
                         img_bgr = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
                         cropped_plate, _ = manager.detect_and_crop_plate(img_bgr)
                         if cropped_plate is not None:
+                            text = manager.extract_text_from_plate(cropped_plate)
                             h, w = cropped_plate.shape[:2]
                             st.session_state.image_results[f.name] = {
                                 'detected_plate_img': cv2.cvtColor(cropped_plate, cv2.COLOR_BGR2RGB),
                                 'plate_aspect_ratio': w / h,
-                                'detected_text': manager.extract_text_from_plate(cropped_plate)
+                                'detected_text': text if text else "N/A"
                             }
+                            if text:
+                                db_manager.record_passage(text, random.choice(CAR_TYPES), random.choice(FEES))
                         else:
                             st.session_state.image_results[f.name] = {
-                                'detected_plate_img': None, 'detected_text': "No Plate Detected", 'plate_aspect_ratio': 3/1
+                                'detected_plate_img': None, 
+                                'detected_text': "No Plate Detected", 
+                                'plate_aspect_ratio': 3/1
                             }
                 st.rerun()
+        elif st.session_state.captured_frame is not None:
+            with st.spinner("Processing..."):
+                img_bgr = cv2.cvtColor(st.session_state.captured_frame, cv2.COLOR_RGB2BGR)
+                cropped_plate, _ = manager.detect_and_crop_plate(img_bgr)
+                if cropped_plate is not None:
+                    text = manager.extract_text_from_plate(cropped_plate)
+                    st.session_state.detected_plate_img = cv2.cvtColor(cropped_plate, cv2.COLOR_BGR2RGB)
+                    h, w = cropped_plate.shape[:2]
+                    st.session_state.plate_aspect_ratio = w / h
+                    st.session_state.detected_text = text if text else "N/A"
+                    if text:
+                        db_manager.record_passage(text, random.choice(CAR_TYPES), random.choice(FEES))
+                    st.rerun()
 
     # Video/Image Container
     video_container = st.container(border=True)
@@ -141,19 +177,22 @@ with left_col:
         if live_feed:
             cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
             frame_placeholder = st.empty()
-            if st.button("Capture Photo"): st.session_state.live_feed_toggle = False
+            if st.button("Capture Photo"): 
+                st.session_state.live_feed_toggle = False
             
-            while cap.isOpened() and st.session_state.get('live_feed_toggle', True):
-                ret, frame = cap.read()
-                if not ret: break
-                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                frame_placeholder.image(frame_rgb, width='stretch')
-                st.session_state.captured_frame = frame_rgb
-            cap.release()
+            try:
+                while cap.isOpened() and st.session_state.get('live_feed_toggle', True):
+                    ret, frame = cap.read()
+                    if not ret: break
+                    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    frame_placeholder.image(frame_rgb, width='stretch')
+                    st.session_state.captured_frame = frame_rgb
+            finally:
+                cap.release()
 
         # 2. UPLOADED FILE DISPLAY (Navigation + Logic)
         elif uploaded_files:
-            # Navigation Bar (5-Column Layout to center the counter)
+            # Navigation Bar (4-Column Layout to center the counter)
             if len(uploaded_files) > 1:
                 def move_index(delta):
                     st.session_state.current_index = (st.session_state.current_index + delta) % len(uploaded_files)
@@ -165,7 +204,8 @@ with left_col:
                     st.button("⬅️ Previous", width='stretch', on_click=move_index, args=(-1,))
                 
                 with n_c2:
-                    def sync_index(): st.session_state.current_index = st.session_state.nav_jump - 1
+                    def sync_index(): 
+                        st.session_state.current_index = st.session_state.nav_jump - 1
                     st.number_input("Idx", 1, len(uploaded_files), value=int(st.session_state.current_index + 1), 
                                     key="nav_jump", on_change=sync_index, label_visibility="collapsed")
                 
@@ -190,26 +230,46 @@ with left_col:
                     st.session_state.plate_aspect_ratio = res['plate_aspect_ratio']
                 else:
                     st.session_state.detected_plate_img = None
+            elif current_file.type.startswith('video'):
+                st.video(current_file)
 
         elif st.session_state.captured_frame is not None:
-            st.image(st.session_state.captured_frame, caption="Captured Frame")
+            st.image(st.session_state.captured_frame, caption="Captured Frame", width='stretch')
             if st.button("Clear Capture"):
                 st.session_state.captured_frame = None
+                st.session_state.detected_plate_img = None
+                st.session_state.detected_text = None
+                st.session_state.image_results = {}
                 st.rerun()
         else:
-            st.markdown("<div style='padding:100px; text-align:center; color:gray;'>Awaiting media...</div>", unsafe_allow_html=True)
+            st.markdown("<div style='padding:100px; text-align:center; color:gray;'><i>Awaiting media...</i></div>", unsafe_allow_html=True)
 
 # ==========================================
 # RIGHT COLUMN: DATABASE & RESULTS
 # ==========================================
 with right_col:
-    st.subheader("Database Records (Toll Info)")
-    c1, c2 = st.columns([1, 2])
-    with c1: st.button("Switch Table", width='stretch')
-    with c2: search = st.text_input("Search", placeholder="🔍 Search Plate...", label_visibility="collapsed")
+    st.subheader(f"Database View: {st.session_state.view_table}")
+    control_col1, control_col2 = st.columns([1, 1.5])
     
-    filtered_df = df[df["License Plate"].str.contains(search.upper())] if search else df
-    st.dataframe(filtered_df, width='stretch', hide_index=True)
+    with control_col1:
+        tables = ["Logs", "Cars", "Drivers"]
+        current_idx = tables.index(st.session_state.view_table)
+        if st.button(f"🔄 Switch to {tables[(current_idx + 1) % 3]}", width='stretch'):
+            st.session_state.view_table = tables[(current_idx + 1) % 3]
+            st.rerun()
+            
+    with control_col2:
+        search_query = st.text_input("Search", placeholder="🔍 Search Plate / Name...", label_visibility="collapsed")
+    
+    if not df.empty:
+        if search_query:
+            mask = df.astype(str).apply(lambda x: x.str.contains(search_query, case=False)).any(axis=1)
+            display_df = df[mask]
+        else:
+            display_df = df
+        st.dataframe(display_df, width='stretch', hide_index=True)
+    else:
+        st.info("No records found in this table.")
 
     if st.session_state.detected_plate_img is not None:
         st.markdown("---")
@@ -218,8 +278,9 @@ with right_col:
         with res_col1:
             st.image(st.session_state.detected_plate_img, caption="Cropped Plate", width='stretch')
         with res_col2:
+            aspect = st.session_state.get('plate_aspect_ratio', 3/1)
             st.markdown(f"""
-                <div style="background:#0e1117; width:100%; aspect-ratio:{st.session_state.plate_aspect_ratio}; 
+                <div style="background:#0e1117; width:100%; aspect-ratio:{aspect}; 
                 border-radius:12px; border:2px solid #31333f; display:flex; justify-content:center; align-items:center;">
                     <h1 style="color:white; font-size:2.5vw; font-family:monospace; letter-spacing:0.5vw; direction:rtl;">
                         {st.session_state.detected_text}
