@@ -5,7 +5,7 @@ from datetime import datetime
 class DatabaseManager:
     def __init__(self):
         # --- CONFIGURATION ---
-        self.server = 'localhost' 
+        self.server = 'DESKTOP-AV54BGA\\SQLEXPRESS' 
         self.database = 'SmartTollSystem'
         self.username = 'YOUR_USERNAME'
         self.password = 'YOUR_PASSWORD'

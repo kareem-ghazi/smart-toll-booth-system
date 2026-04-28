@@ -3,6 +3,10 @@
    Tables: Cars, Log, Drivers
 */
 
+-- 0. Create Database
+-- CREATE DATABASE SmartTollSystem
+-- USE SmartTollSystem
+
 -- 1. Cars Table (Central Relation)
 CREATE TABLE Cars (
     plate NVARCHAR(20) PRIMARY KEY,        -- Using plate as the primary key for direct linkage
