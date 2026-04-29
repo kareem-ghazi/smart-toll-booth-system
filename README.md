@@ -81,6 +81,26 @@ If you wish to retrain the models with your own data:
 *   **Searchable Database:** A clean UI to view, search, and manage toll records.
 *   **Dual YOLO Pipeline:** Separated models for high-accuracy detection and recognition.
 
+## 📊 Dataset
+
+This project utilizes the EALPR (Egyptian Automated License Plate Recognition) dataset. We would like to credit the authors for providing this benchmark dataset:
+
+**Citation:**
+> Youssef, Ahmed Ramadan and Sayed, Fawzya Ramadan and Ali, Abdelmgeid Ameen, "A New Benchmark Dataset for Egyptian License Plate Detection and Recognition," 2022 7th Asia-Pacific Conference on Intelligent Robot Systems (ACIRS), 2022, pp. 106-111, doi: 10.1109/ACIRS55390.2022.9845514.
+
+**BibTeX:**
+```bibtex
+@INPROCEEDINGS{9845514,
+  author={Youssef, Ahmed Ramadan and Sayed, Fawzya Ramadan and Ali, Abdelmgeid Ameen},
+  booktitle={2022 7th Asia-Pacific Conference on Intelligent Robot Systems (ACIRS)}, 
+  title={A New Benchmark Dataset for Egyptian License Plate Detection and Recognition}, 
+  year={2022},
+  volume={},
+  number={},
+  pages={106-111},
+  doi={10.1109/ACIRS55390.2022.9845514}}
+```
+
 ## 📄 License
 
 This project is licensed under the terms of the `LICENSE.txt` file included in this repository.
