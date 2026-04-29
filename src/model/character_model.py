@@ -81,7 +81,7 @@ if __name__ == "__main__":
     test_image = os.path.join(project_root, 'src', 'data', 'processed_plates', 'test', 'images', '0002_license_plate_1.png')
     output_image = os.path.join(project_root, 'src', 'data', 'character_detection_result.jpg')
     
-    # Finetune for 20 epochs
+    # Finetune for 150 epochs
     model, _ = finetune_character_model(data_yaml, epochs=150)
     
     # Test

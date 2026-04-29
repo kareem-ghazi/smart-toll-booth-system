@@ -53,8 +53,7 @@ if __name__ == "__main__":
     test_image = os.path.join(project_root, 'src', 'data', 'processed_vehicles', 'test', 'images', '0002.jpg')
     output_image = os.path.join(project_root, 'src', 'data', 'detection_result.jpg')
     
-    # Finetune
-    # Using 1 epoch for quick demonstration, increase as needed
+    # Training on 100 epochs
     model, train_results = finetune_yolo(data_yaml, epochs=100)
     
     # Test

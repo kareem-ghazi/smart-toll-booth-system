@@ -1,5 +1,5 @@
 /* 
-   Smart Toll System - Relational Database Schema
+   Smart Toll Booth System - Relational Database Schema
    Tables: Cars, Passage_Log, Drivers
 */
 
@@ -72,7 +72,7 @@ INSERT INTO Drivers (NID, Full_Name, Phone, Address, License_Expiry) VALUES ('29
 INSERT INTO Drivers (NID, Full_Name, Phone, Address, License_Expiry) VALUES ('283111844973', N'Mona El-Shazly', '01099990000', N'Matrouh', '2032-11-11');
 INSERT INTO Drivers (NID, Full_Name, Phone, Address, License_Expiry) VALUES ('283051430730', N'Bassem Youssef', '01100001111', N'Red Sea', '2029-01-24');
 
--- Cars (45 from experimental/)
+-- Cars (45 unique license plates)
 INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'طبج - ٣٩٤٥', 'Pickup', 'Renault', 'Logan', 2013, '295022516175');
 INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'وطن - ١', 'Pickup', 'Renault', 'Megane', 2016, '287081946463');
 INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'نقق - ٧٤٨', 'Pickup', 'Kia', 'Picanto', 2010, '293101357447');
