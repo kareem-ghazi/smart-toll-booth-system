@@ -104,6 +104,3 @@ This project utilizes the EALPR (Egyptian Automated License Plate Recognition) d
 ## 📄 License
 
 This project is licensed under the terms of the `LICENSE.txt` file included in this repository.
-
----
-*Developed as a smart infrastructure solution.*
