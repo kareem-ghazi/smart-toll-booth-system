@@ -4,8 +4,8 @@
 */
 
 -- 0. Create Database
-CREATE DATABASE SmartTollSystem;
-GO
+-- CREATE DATABASE SmartTollSystem;
+-- GO
 USE SmartTollSystem;
 GO
 
@@ -72,54 +72,49 @@ INSERT INTO Drivers (NID, Full_Name, Phone, Address, License_Expiry) VALUES ('29
 INSERT INTO Drivers (NID, Full_Name, Phone, Address, License_Expiry) VALUES ('283111844973', N'Mona El-Shazly', '01099990000', N'Matrouh', '2032-11-11');
 INSERT INTO Drivers (NID, Full_Name, Phone, Address, License_Expiry) VALUES ('283051430730', N'Bassem Youssef', '01100001111', N'Red Sea', '2029-01-24');
 
--- Cars (50 from experimental/)
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'جبط - ٣٩٤٥', 'Pickup', 'Renault', 'Logan', 2013, '295022516175');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'نطو - ١', 'Pickup', 'Renault', 'Megane', 2016, '287081946463');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'ققن - ٧٤٨', 'Pickup', 'Kia', 'Picanto', 2010, '293101357447');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'ىور - ٤٨٥١', 'Pickup', 'Chevrolet', 'Optra', 2013, '288082157819');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'دقص - ٢٤١١', 'Pickup', 'Nissan', 'Sunny', 2017, '287121880644');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'طد - ١', 'Sedan', 'Hyundai', 'Tucson', 2025, '281010338657');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'ىوق - ١١١١', 'Hatchback', 'Kia', 'Sportage', 2025, '295072170142');
+-- Cars (45 from experimental/)
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'طبج - ٣٩٤٥', 'Pickup', 'Renault', 'Logan', 2013, '295022516175');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'وطن - ١', 'Pickup', 'Renault', 'Megane', 2016, '287081946463');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'نقق - ٧٤٨', 'Pickup', 'Kia', 'Picanto', 2010, '293101357447');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'روى - ٤٨٥١', 'Pickup', 'Chevrolet', 'Optra', 2013, '288082157819');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'صقد - ٢٤١١', 'Pickup', 'Nissan', 'Sunny', 2017, '287121880644');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'دط - ١', 'Sedan', 'Hyundai', 'Tucson', 2025, '281010338657');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'قوى - ١١١١', 'Hatchback', 'Kia', 'Sportage', 2025, '295072170142');
 INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'مم - ٦٦٦٦', 'SUV', 'Mitsubishi', 'Eclipse', 2023, '290020359797');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'سع - ١', 'Hatchback', 'Nissan', 'Sentra', 2019, '286110999593');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'ىدھ - ١١١١', 'Pickup', 'Chevrolet', 'Cruze', 2024, '280090795181');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'ىلع - ٨٨٨', 'SUV', 'Nissan', 'Sunny', 2020, '283012446048');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'عھق - ٥٨٤٧', 'Hatchback', 'Renault', 'Logan', 2017, '283012446048');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'ىلع - ١', 'Sedan', 'Toyota', 'Corolla', 2012, '283112481482');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'رصم - ٢', 'Pickup', 'Hyundai', 'Tucson', 2017, '283070382357');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'دسأ - ٤١٤', 'Van', 'Nissan', 'Sentra', 2014, '283111844973');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'ردب - ٨٨٨٨', 'Hatchback', 'Fiat', '500', 2017, '281042714207');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'عس - ١', 'Hatchback', 'Nissan', 'Sentra', 2019, '286110999593');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'ھدى - ١١١١', 'Pickup', 'Chevrolet', 'Cruze', 2024, '280090795181');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'على - ٨٨٨', 'SUV', 'Nissan', 'Sunny', 2020, '283012446048');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'قھع - ٥٨٤٧', 'Hatchback', 'Renault', 'Logan', 2017, '283012446048');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'على - ١', 'Sedan', 'Toyota', 'Corolla', 2012, '283112481482');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'مصر - ٢', 'Pickup', 'Hyundai', 'Tucson', 2017, '283070382357');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'أسد - ٤١٤', 'Van', 'Nissan', 'Sentra', 2014, '283111844973');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'بدر - ٨٨٨٨', 'Hatchback', 'Fiat', '500', 2017, '281042714207');
 INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'م - ٣', 'Van', 'Nissan', 'Sunny', 2013, '285111488172');
 INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'أأ - ١١', 'Van', 'BMW', '520i', 2023, '288112383000');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'لفد - ٦٦٦', 'Sedan', 'Hyundai', 'Elantra', 2022, '283111844973');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'رأس - ٥٥٥', 'Pickup', 'Hyundai', 'Elantra', 2016, '290020359797');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'ىلع - ٩٩٩٩', 'Hatchback', 'Chevrolet', 'Optra', 2023, '285121454597');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'بجر - ٦٦٦', 'Pickup', 'Chevrolet', 'Optra', 2012, '288112383000');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'عم - ٦٦٦٦', 'Hatchback', 'Hyundai', 'Elantra', 2010, '281010338657');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'علد - ٦٦٦٦', 'SUV', 'Kia', 'Cerato', 2025, '281042714207');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'دفل - ٦٦٦', 'Sedan', 'Hyundai', 'Elantra', 2022, '283111844973');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'سأر - ٥٥٥', 'Pickup', 'Hyundai', 'Elantra', 2016, '290020359797');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'على - ٩٩٩٩', 'Hatchback', 'Chevrolet', 'Optra', 2023, '285121454597');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'رجب - ٦٦٦', 'Pickup', 'Chevrolet', 'Optra', 2012, '288112383000');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'مع - ٦٦٦٦', 'Hatchback', 'Hyundai', 'Elantra', 2010, '281010338657');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'دلع - ٦٦٦٦', 'SUV', 'Kia', 'Cerato', 2025, '281042714207');
 INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'ججج - ٥٥٥', 'SUV', 'Mercedes', 'C200', 2015, '286110999593');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'أأس - ١١١١', 'Sedan', 'Mercedes', 'E200', 2024, '291100719116');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'سأأ - ١١١١', 'Sedan', 'Mercedes', 'E200', 2024, '291100719116');
 INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'و - ١١', 'Van', 'Renault', 'Megane', 2025, '287081946463');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'ھھ - ٢٢', 'SUV', 'Mitsubishi', 'Lancer', 2011, '287121880644');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'ىلع - ٣٣٣', 'Hatchback', 'Toyota', 'Fortuner', 2020, '283112481482');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'ھھ - ٢٢٢٢', 'SUV', 'Mitsubishi', 'Lancer', 2011, '287121880644');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'على - ٣٣٣', 'Hatchback', 'Toyota', 'Fortuner', 2020, '283112481482');
 INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'ععع - ٢٢٢٢', 'Sedan', 'Fiat', '500', 2015, '283112481482');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'دىس - ٧٧٧', 'Hatchback', 'Hyundai', 'Elantra', 2012, '293101357447');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'رمن - ٧٧', 'Sedan', 'Nissan', 'Qashqai', 2013, '287121880644');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'أأ - ١', 'SUV', 'Fiat', 'Punto', 2011, '293101357447');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'و - ١١', 'Sedan', 'Mercedes', 'GLC', 2020, '283070382357');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'سىد - ٧٧٧', 'Hatchback', 'Hyundai', 'Elantra', 2012, '293101357447');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'نمر - ٧٧', 'Sedan', 'Nissan', 'Qashqai', 2013, '287121880644');
 INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'فف - ١١١١', 'SUV', 'BMW', '320i', 2018, '286110999593');
 INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'أأ - ١', 'SUV', 'Mitsubishi', 'Pajero', 2020, '283051430730');
 INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'صص - ٢٢٢٢', 'Sedan', 'Toyota', 'Yaris', 2013, '281010338657');
 INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'ففف - ٥٥٥٥', 'Hatchback', 'Nissan', 'Sentra', 2018, '287081946463');
 INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'و - ١', 'Pickup', 'Hyundai', 'Elantra', 2021, '291100719116');
 INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'ھ - ١', 'SUV', 'Chevrolet', 'Cruze', 2019, '293101357447');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'فىس - ١', 'Hatchback', 'Toyota', 'Fortuner', 2019, '285111488172');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'ففف - ٥٥٥٥', 'Sedan', 'Kia', 'Cerato', 2013, '280090795181');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'سىف - ١', 'Hatchback', 'Toyota', 'Fortuner', 2019, '285111488172');
 INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'ممم - ١', 'Hatchback', 'Kia', 'Cerato', 2019, '293101357447');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'دسأ - ١', 'SUV', 'BMW', '320i', 2018, '288020784341');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'أسد - ١', 'SUV', 'BMW', '320i', 2018, '288020784341');
 INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'د - ١', 'Van', 'Mitsubishi', 'Lancer', 2012, '295022516175');
 INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'ر - ١', 'Van', 'Mitsubishi', 'Lancer', 2010, '289022840512');
 INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'للل - ١١١١', 'SUV', 'Mitsubishi', 'Lancer', 2024, '295072170142');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'دىس - ٣٣٣٣', 'Van', 'Renault', 'Logan', 2013, '281010338657');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'و - ١١', 'SUV', 'Renault', 'Logan', 2021, '287121880644');
-INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'و - ١١', 'Hatchback', 'Kia', 'Cerato', 2014, '283112481482');
+INSERT INTO Cars (License_Plate, Car_Type, Brand, Model, Manufacture_Year, Owner_NID) VALUES (N'سىد - ٣٣٣٣', 'Van', 'Renault', 'Logan', 2013, '281010338657');

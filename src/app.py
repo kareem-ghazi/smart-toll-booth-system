@@ -80,17 +80,17 @@ def load_data():
         if st.session_state.view_table == "Logs":
             df = db_manager.get_recent_logs()
             if not df.empty:
-                df.columns = ["License Plate", "Car Type", "Fee ($)", "Timestamp"]
+                df.columns = ["License Plate", "Applied Fee ($)", "Timestamp"]
             return df
         elif st.session_state.view_table == "Cars":
             df = db_manager.get_all_cars()
             if not df.empty:
-                df.columns = ["License Plate", "Type", "Passes", "Total Fees ($)"]
+                df.columns = ["License Plate", "Type", "Brand", "Model", "Year", "Owed Fees ($)", "Owner NID", "Last Seen"]
             return df
         elif st.session_state.view_table == "Drivers":
             df = db_manager.get_all_drivers()
             if not df.empty:
-                df.columns = ["NID", "Full Name", "Phone", "Plate", "Last Update"]
+                df.columns = ["NID", "Full Name", "Phone", "Address", "License Expiry"]
             return df
     except Exception as e:
         st.error(f"Table Error: {e}")

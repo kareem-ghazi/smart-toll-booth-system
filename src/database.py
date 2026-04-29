@@ -44,27 +44,23 @@ class DatabaseManager:
             conn = self._get_connection()
             cursor = conn.cursor()
             
-            # Simplified MERGE to avoid issues with missing columns like 'last_seen'
-            upsert_query = """
-            MERGE INTO Cars AS target
-            USING (SELECT ? AS plate, ? AS car_type, ? AS fee) AS source
-            ON target.plate = source.plate
-            WHEN MATCHED THEN
-                UPDATE SET 
-                    pass_count = target.pass_count + 1,
-                    total_fees = target.total_fees + source.fee,
-                    car_type = source.car_type
-            WHEN NOT MATCHED THEN
-                INSERT (plate, car_type, pass_count, total_fees)
-                VALUES (source.plate, source.car_type, 1, source.fee);
+            # Update car's owed fees and last seen time if it exists
+            update_car_query = """
+            UPDATE Cars 
+            SET Owed_Fees = Owed_Fees + ?, 
+                Last_Seen = GETDATE(),
+                Car_Type = ?
+            WHERE License_Plate = ?;
             """
-            cursor.execute(upsert_query, (plate, car_type, fee))
+            cursor.execute(update_car_query, (fee, car_type, plate))
 
+            # Record in passage log
+            # Note: This will only succeed if the car exists in Cars table due to FK constraint
             log_query = """
-            INSERT INTO Log (plate, fee, car_type, time)
-            VALUES (?, ?, ?, GETDATE());
+            INSERT INTO Passage_Log (License_Plate, Applied_Fee, Passing_Time)
+            VALUES (?, ?, GETDATE());
             """
-            cursor.execute(log_query, (plate, fee, car_type))
+            cursor.execute(log_query, (plate, fee))
 
             conn.commit()
             print(f"DEBUG: Successfully recorded {plate}")
@@ -85,20 +81,22 @@ class DatabaseManager:
             columns = [column[0] for column in cursor.description]
             data = [list(row) for row in rows]
             return pd.DataFrame(data, columns=columns)
+        except Exception as e:
+            print(f"DEBUG: Error fetching dataframe -> {e}")
+            return pd.DataFrame()
         finally:
             conn.close()
 
     def get_recent_logs(self, limit=100):
-        query = f"SELECT TOP {limit} plate, car_type, fee, time FROM Log ORDER BY time DESC"
+        query = f"SELECT TOP {limit} License_Plate, Applied_Fee, Passing_Time FROM Passage_Log ORDER BY Passing_Time DESC"
         return self._fetch_as_dataframe(query)
 
     def get_all_cars(self):
-        # Removed 'last_seen' from query to fix the crash
-        query = "SELECT plate, car_type, pass_count, total_fees FROM Cars ORDER BY pass_count DESC"
+        query = "SELECT * FROM Cars ORDER BY Last_Seen DESC"
         return self._fetch_as_dataframe(query)
 
     def get_all_drivers(self):
-        query = "SELECT nid, name, phone, plate, last_update FROM Drivers"
+        query = "SELECT * FROM Drivers"
         return self._fetch_as_dataframe(query)
 
 db_manager = DatabaseManager()
