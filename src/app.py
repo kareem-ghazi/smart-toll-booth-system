@@ -133,7 +133,7 @@ with left_col:
     # Process Logic
     if process_btn:
         if uploaded_files:
-            with st.spinner("Processing..."):
+            with st.spinner(f"Processing {len(uploaded_files)} images..."):
                 for f in uploaded_files:
                     if f.type.startswith('image/'):
                         img = Image.open(f)
@@ -157,7 +157,7 @@ with left_col:
                             }
                 st.rerun()
         elif st.session_state.captured_frame is not None:
-            with st.spinner("Processing..."):
+            with st.spinner("Processing image..."):
                 img_bgr = cv2.cvtColor(st.session_state.captured_frame, cv2.COLOR_RGB2BGR)
                 cropped_plate, _ = manager.detect_and_crop_plate(img_bgr)
                 if cropped_plate is not None:
