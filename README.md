@@ -10,13 +10,32 @@ The Smart Toll Booth Detection System is designed to automate the process of veh
 3.  **Recognize Characters:** Perform Optical Character Recognition (OCR) on the license plates to extract the plate number.
 4.  **Manage Records:** Track toll transactions in a database with a user-friendly dashboard.
 
-## 🛠️ Tech Stack
+## 🛠️ Tech Stack & Libraries
 
-*   **UI/Dashboard:** [Streamlit](https://streamlit.io/)
-*   **Computer Vision:** [OpenCV](https://opencv.org/), [PIL](https://python-pillow.org/)
-*   **Deep Learning:** [Ultralytics YOLO](https://docs.ultralytics.com/)
-*   **Data Processing:** [NumPy](https://numpy.org/), [Pandas](https://pandas.pydata.org/)
-*   **Language:** Python 3.x
+The following libraries are used in this project (as listed in `requirements.txt`):
+
+*   **`streamlit`**: Used to build the interactive web-based dashboard and user interface.
+*   **`ultralytics`**: Provides the YOLOv8 implementation for vehicle detection, license plate localization, and character recognition.
+*   **`opencv-python`**: Used for real-time image processing, video stream handling, and image transformations.
+*   **`pandas`**: Facilitates data manipulation and structured display of database records within the UI.
+*   **`numpy`**: Handles large, multi-dimensional arrays and matrices for image data processing.
+*   **`pillow` (PIL)**: Used for opening, manipulating, and saving many different image file formats.
+*   **`PyYAML`**: Used for parsing and managing configuration files (like `data.yaml`) for YOLO training.
+*   **`pyodbc`**: Used to establish connections to an **MS SQL Server** database to store and retrieve persistent toll booth records.
+
+## 🗄️ Database Architecture
+
+We use **MS SQL Server** as our primary relational database management system. This ensures robust data storage for vehicle logs, owner information, and transaction history.
+
+### Visual Assets & Diagrams
+
+| Application Dashboard | Database Relationship |
+| :---: | :---: |
+| ![Application Interface](assets/Application%20(1).png) | ![Database Overview](assets/Database%20(2).png) |
+
+| Entity Relationship Diagram (ERD) | Schema Diagram |
+| :---: | :---: |
+| ![Database ERD](assets/Database%20ERD.png) | ![Schema Diagram](assets/Database%20Schema%20Diagram.png) |
 
 ## 📁 Project Structure
 
@@ -24,17 +43,20 @@ The Smart Toll Booth Detection System is designed to automate the process of veh
 smart-toll-booth-system/
 ├── src/
 │   ├── app.py              # Streamlit web application
-│   ├── database.py         # Database management (SQLite/Dummy)
+│   ├── database.py         # Database management (MS SQL Server via pyodbc)
 │   ├── manager.py          # System orchestration logic
 │   ├── model/
 │   │   ├── lp_model.py     # Vehicle & License Plate detection trainer
 │   │   ├── character_model.py # License Plate character recognition trainer
 │   │   └── outputs/        # Trained .pt model files
 │   ├── data/
-│   │   ├── processed_plates/  # Dataset for character detection & recognition (labels/images)
+│   │   ├── processed_plates/  # Dataset for character detection & recognition
 │   │   └── processed_vehicles/ # Dataset for vehicle detection
 │   └── utils/
+│       ├── create_db.sql    # SQL script to initialize MS SQL tables
+│       ├── clean_db.sql     # SQL script to drop/reset tables
 │       └── dataset_splitter.py # Utility to split raw data
+├── assets/                 # Project diagrams and screenshots
 ├── LICENSE.txt             # Project license
 └── README.md               # You are here!
 ```
@@ -44,6 +66,7 @@ smart-toll-booth-system/
 ### Prerequisites
 
 *   Python 3.10+
+*   MS SQL Server (configured and accessible)
 
 ### Installation
 
@@ -72,13 +95,11 @@ If you wish to retrain the models with your own data:
 *   **License Plate Detection:** `python src/model/lp_model.py`
 *   **Character Recognition:** `python src/model/character_model.py`
 
-*Ensure your `data.yaml` files in `src/data/` are correctly configured.*
-
 ## ⚙️ Features
 
 *   **Live Camera Feed:** Real-time capture and processing from a webcam.
 *   **Media Upload:** Support for processing static images and recorded videos.
-*   **Searchable Database:** A clean UI to view, search, and manage toll records.
+*   **Searchable Database:** A clean UI to view, search, and manage toll records stored in MS SQL Server.
 *   **Dual YOLO Pipeline:** Separated models for high-accuracy detection and recognition.
 
 ## 📊 Dataset
@@ -87,19 +108,6 @@ This project utilizes the EALPR (Egyptian Automated License Plate Recognition) d
 
 **Citation:**
 > Youssef, Ahmed Ramadan and Sayed, Fawzya Ramadan and Ali, Abdelmgeid Ameen, "A New Benchmark Dataset for Egyptian License Plate Detection and Recognition," 2022 7th Asia-Pacific Conference on Intelligent Robot Systems (ACIRS), 2022, pp. 106-111, doi: 10.1109/ACIRS55390.2022.9845514.
-
-**BibTeX:**
-```bibtex
-@INPROCEEDINGS{9845514,
-  author={Youssef, Ahmed Ramadan and Sayed, Fawzya Ramadan and Ali, Abdelmgeid Ameen},
-  booktitle={2022 7th Asia-Pacific Conference on Intelligent Robot Systems (ACIRS)}, 
-  title={A New Benchmark Dataset for Egyptian License Plate Detection and Recognition}, 
-  year={2022},
-  volume={},
-  number={},
-  pages={106-111},
-  doi={10.1109/ACIRS55390.2022.9845514}}
-```
 
 ## 📄 License
 
