@@ -5,23 +5,24 @@ An automated toll booth system that utilizes deep learning (YOLO) to detect vehi
 ## 🌟 Overview
 
 The Smart Toll Booth Detection System is designed to automate the process of vehicle identification and toll management. It leverages custom-trained YOLO models to:
-1.  **Detect Vehicles:** Identify vehicles as they approach the toll booth.
-2.  **Locate License Plates:** Precisely crop license plate regions from vehicle images.
-3.  **Recognize Characters:** Perform Optical Character Recognition (OCR) on the license plates to extract the plate number.
-4.  **Manage Records:** Track toll transactions in a database with a user-friendly dashboard.
+
+1. **Detect Vehicles:** Identify vehicles as they approach the toll booth.
+2. **Locate License Plates:** Precisely crop license plate regions from vehicle images.
+3. **Recognize Characters:** Perform Optical Character Recognition (OCR) on the license plates to extract the plate number.
+4. **Manage Records:** Track toll transactions in a database with a user-friendly dashboard.
 
 ## 🛠️ Tech Stack & Libraries
 
 The following libraries are used in this project (as listed in `requirements.txt`):
 
-*   **`streamlit`**: Used to build the interactive web-based dashboard and user interface.
-*   **`ultralytics`**: Provides the YOLOv26 implementation for vehicle detection, license plate localization, and character recognition.
-*   **`opencv-python`**: Used for real-time image processing, video stream handling, and image transformations.
-*   **`pandas`**: Facilitates data manipulation and structured display of database records within the UI.
-*   **`numpy`**: Handles large, multi-dimensional arrays and matrices for image data processing.
-*   **`pillow` (PIL)**: Used for opening, manipulating, and saving many different image file formats.
-*   **`PyYAML`**: Used for parsing and managing configuration files (like `data.yaml`) for YOLO training.
-*   **`pyodbc`**: Used to establish connections to an **MS SQL Server** database to store and retrieve persistent toll booth records.
+* **`streamlit`**: Used to build the interactive web-based dashboard and user interface.
+* **`ultralytics`**: Provides the YOLOv26 implementation for vehicle detection, license plate localization, and character recognition.
+* **`opencv-python`**: Used for real-time image processing, video stream handling, and image transformations.
+* **`pandas`**: Facilitates data manipulation and structured display of database records within the UI.
+* **`numpy`**: Handles large, multi-dimensional arrays and matrices for image data processing.
+* **`pillow` (PIL)**: Used for opening, manipulating, and saving many different image file formats.
+* **`PyYAML`**: Used for parsing and managing configuration files (like `data.yaml`) for YOLO training.
+* **`pyodbc`**: Used to establish connections to an **MS SQL Server** database to store and retrieve persistent toll booth records.
 
 ## 🗄️ Database Architecture
 
@@ -31,7 +32,7 @@ We use **MS SQL Server** as our primary relational database management system. T
 
 | Asset | Preview |
 | :--- | :---: |
-| **System Demo** | <video src="assets/Demo.mp4" controls width="100%"></video> |
+| **System Demo** | <video src="https://raw.githubusercontent.com/kareem-ghazi/smart-toll-booth-system/main/assets/Demo.mp4" controls width="100%"></video> |
 | **Application Dashboard** | ![Application Interface](assets/Application%20(1).png) |
 | **Database (MS SQL Server)** | ![Database Overview](assets/Database%20(2).png) |
 
@@ -68,18 +69,20 @@ smart-toll-booth-system/
 
 ### Prerequisites
 
-*   Python 3.10+
-*   MS SQL Server (configured and accessible)
+* Python 3.10+
+* MS SQL Server (configured and accessible)
 
 ### Installation
 
-1.  **Clone the repository:**
+1. **Clone the repository:**
+
     ```bash
     git clone https://github.com/your-username/smart-toll-booth-system.git
     cd smart-toll-booth-system
     ```
 
-2.  **Install dependencies:**
+2. **Install dependencies:**
+
     ```bash
     pip install -r requirements.txt
     ```
@@ -87,6 +90,7 @@ smart-toll-booth-system/
 ### Running the Application
 
 To launch the interactive dashboard:
+
 ```bash
 streamlit run src/app.py
 ```
@@ -95,15 +99,15 @@ streamlit run src/app.py
 
 If you wish to retrain the models with your own data:
 
-*   **License Plate Detection:** `python src/model/lp_model.py`
-*   **Character Recognition:** `python src/model/character_model.py`
+* **License Plate Detection:** `python src/model/lp_model.py`
+* **Character Recognition:** `python src/model/character_model.py`
 
 ## ⚙️ Features
 
-*   **Live Camera Feed:** Real-time capture and processing from a webcam.
-*   **Media Upload:** Support for processing static images and recorded videos.
-*   **Searchable Database:** A clean UI to view, search, and manage toll records stored in MS SQL Server.
-*   **Dual YOLO Pipeline:** Separated models for high-accuracy detection and recognition.
+* **Live Camera Feed:** Real-time capture and processing from a webcam.
+* **Media Upload:** Support for processing static images and recorded videos.
+* **Searchable Database:** A clean UI to view, search, and manage toll records stored in MS SQL Server.
+* **Dual YOLO Pipeline:** Separated models for high-accuracy detection and recognition.
 
 ## 📊 Dataset
 
