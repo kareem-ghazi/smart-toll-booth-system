@@ -31,13 +31,14 @@ We use **MS SQL Server** as our primary relational database management system. T
 
 | Asset | Preview |
 | :--- | :---: |
+| **System Demo** | <video src="assets/Demo.mp4" controls width="100%"></video> |
 | **Application Dashboard** | ![Application Interface](assets/Application%20(1).png) |
-| **Database Relationship** | ![Database Overview](assets/Database%20(2).png) |
+| **Database (MS SQL Server)** | ![Database Overview](assets/Database%20(2).png) |
 
 | Diagram | Preview |
 | :--- | :---: |
 | **Entity Relationship Diagram (ERD)** | ![Database ERD](assets/Database%20ERD.png) |
-| **Schema Diagram** | ![Database Schema Diagram](assets/Database%20Schema%20Diagram.png) |
+| **Database Schema Diagram** | ![Database Schema Diagram](assets/Database%20Schema%20Diagram.png) |
 
 ## 📁 Project Structure
 
