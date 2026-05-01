@@ -69,6 +69,8 @@ if 'uploader_key' not in st.session_state:
     st.session_state.uploader_key = 0
 if 'nav_jump' not in st.session_state:
     st.session_state.nav_jump = 1
+if 'plate_search_query' not in st.session_state:
+    st.session_state.plate_search_query = ""
 
 # --- Constants for Randomization ---
 FEES = [10.0, 15.0, 20.0, 25.0]
@@ -100,20 +102,42 @@ df = load_data()
 
 # --- Main Title ---
 st.title("Smart Toll Booth Detection System")
+st.markdown("""
+    This system automates toll booth operations by detecting license plates and recognizing characters in real-time. 
+    It leverages deep learning (YOLOv8) to identify vehicles, record their passage, and manage a relational database 
+    for efficient toll collection and monitoring.
+""")
 st.markdown("---")
+
+# --- Media Upload Logic (Before Columns) ---
+def reset_index():
+    st.session_state.current_index = 0
+    st.session_state.nav_jump = 1
+
+uploaded_files = st.file_uploader("Upload Video/Images", type=["mp4", "avi", "jpg", "png"], 
+                                    accept_multiple_files=True, on_change=reset_index, 
+                                    key=f"uploader_{st.session_state.uploader_key}")
+
+# --- Jump to Plate Logic ---
+if st.session_state.plate_search_query and uploaded_files:
+    query = st.session_state.plate_search_query.strip().upper()
+    found_idx = -1
+    for idx, f in enumerate(uploaded_files):
+        if f.name in st.session_state.image_results:
+            res = st.session_state.image_results[f.name]
+            if query in res['detected_text'].upper():
+                found_idx = idx
+                break
+    if found_idx != -1:
+        st.session_state.current_index = found_idx
+        st.session_state.nav_jump = found_idx + 1
+    # Note: We don't clear the query here because the widget is linked to it.
+    # It will remain in the box, which is fine for visibility.
 
 left_col, right_col = st.columns([1.2, 1.5], gap="large")
 
 with left_col:
     st.subheader("Camera / Upload Feed")
-    
-    def reset_index():
-        st.session_state.current_index = 0
-        st.session_state.nav_jump = 1
-
-    uploaded_files = st.file_uploader("Upload Video/Images", type=["mp4", "avi", "jpg", "png"], 
-                                      accept_multiple_files=True, on_change=reset_index, 
-                                      key=f"uploader_{st.session_state.uploader_key}")
     
     col_proc, col_clear = st.columns([2, 1])
     with col_proc:
@@ -197,6 +221,7 @@ with left_col:
                 def move_index(delta):
                     st.session_state.current_index = (st.session_state.current_index + delta) % len(uploaded_files)
                     st.session_state.nav_jump = st.session_state.current_index + 1
+                    st.session_state.plate_search_query = ""
 
                 n_c1, n_c2, n_c3, n_c4 = st.columns([0.7, 0.25, 0.25, 0.7], gap="small")
                 
@@ -206,6 +231,7 @@ with left_col:
                 with n_c2:
                     def sync_index(): 
                         st.session_state.current_index = st.session_state.nav_jump - 1
+                        st.session_state.plate_search_query = ""
                     st.number_input("Idx", 1, len(uploaded_files), value=int(st.session_state.current_index + 1), 
                                     key="nav_jump", on_change=sync_index, label_visibility="collapsed")
                 
@@ -271,20 +297,27 @@ with right_col:
     else:
         st.info("No records found in this table.")
 
-    if st.session_state.detected_plate_img is not None:
+    if st.session_state.image_results:
         st.markdown("---")
-        st.subheader("Detection Result")
-        res_col1, res_col2 = st.columns([1, 1], gap="medium")
-        with res_col1:
-            st.image(st.session_state.detected_plate_img, caption="Cropped Plate", width='stretch')
-        with res_col2:
-            aspect = st.session_state.get('plate_aspect_ratio', 3/1)
-            st.markdown(f"""
-                <div style="background:#0e1117; width:100%; aspect-ratio:{aspect}; 
-                border-radius:12px; border:2px solid #31333f; display:flex; justify-content:center; align-items:center;">
-                    <h1 style="color:white; font-size:2.5vw; font-family:monospace; letter-spacing:0.5vw; direction:rtl;">
-                        {st.session_state.detected_text}
-                    </h1>
-                </div>
-                <p style="text-align:center; color:#808495; font-size:14px; margin-top:5px;">Detected Characters</p>
-            """, unsafe_allow_html=True)
+        res_header_col1, res_header_col2 = st.columns([1.5, 1])
+        with res_header_col1:
+            st.subheader("Detection Result")
+        with res_header_col2:
+            st.text_input("Jump to Plate", placeholder="🔍 Jump to Plate...", 
+                          label_visibility="collapsed", key="plate_search_query")
+
+        if st.session_state.detected_plate_img is not None:
+            res_col1, res_col2 = st.columns([1, 1], gap="medium")
+            with res_col1:
+                st.image(st.session_state.detected_plate_img, caption="Cropped Plate", width='stretch')
+            with res_col2:
+                aspect = st.session_state.get('plate_aspect_ratio', 3/1)
+                st.markdown(f"""
+                    <div style="background:#0e1117; width:100%; aspect-ratio:{aspect}; 
+                    border-radius:12px; border:2px solid #31333f; display:flex; justify-content:center; align-items:center;">
+                        <h1 style="color:white; font-size:2.5vw; font-family:monospace; letter-spacing:0.5vw; direction:rtl;">
+                            {st.session_state.detected_text}
+                        </h1>
+                    </div>
+                    <p style="text-align:center; color:#808495; font-size:14px; margin-top:5px;">Detected Characters</p>
+                """, unsafe_allow_html=True)
