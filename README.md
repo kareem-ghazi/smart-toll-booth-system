@@ -15,7 +15,7 @@ The Smart Toll Booth Detection System is designed to automate the process of veh
 The following libraries are used in this project (as listed in `requirements.txt`):
 
 *   **`streamlit`**: Used to build the interactive web-based dashboard and user interface.
-*   **`ultralytics`**: Provides the YOLOv8 implementation for vehicle detection, license plate localization, and character recognition.
+*   **`ultralytics`**: Provides the YOLOv26 implementation for vehicle detection, license plate localization, and character recognition.
 *   **`opencv-python`**: Used for real-time image processing, video stream handling, and image transformations.
 *   **`pandas`**: Facilitates data manipulation and structured display of database records within the UI.
 *   **`numpy`**: Handles large, multi-dimensional arrays and matrices for image data processing.
