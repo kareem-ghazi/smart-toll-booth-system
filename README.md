@@ -32,7 +32,6 @@ We use **MS SQL Server** as our primary relational database management system. T
 
 | Asset | Preview |
 | :--- | :---: |
-| **System Demo** | <video src="https://raw.githubusercontent.com/kareem-ghazi/smart-toll-booth-system/main/assets/Demo.mp4" controls width="100%"></video> |
 | **Application Dashboard** | ![Application Interface](assets/Application%20(1).png) |
 | **Database (MS SQL Server)** | ![Database Overview](assets/Database%20(2).png) |
 
@@ -69,7 +68,7 @@ smart-toll-booth-system/
 
 ### Prerequisites
 
-* Python 3.10+
+* Python 3.12+
 * MS SQL Server (configured and accessible)
 
 ### Installation
