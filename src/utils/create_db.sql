@@ -28,6 +28,7 @@ CREATE TABLE Cars (
     Owed_Fees DECIMAL(10, 2) DEFAULT 0.00,
     Owner_NID VARCHAR(20) NOT NULL,
     Last_Seen DATETIME,
+    Passes INT DEFAULT 0,
     CONSTRAINT FK_Cars_Drivers FOREIGN KEY (Owner_NID) REFERENCES Drivers(NID)
 );
 

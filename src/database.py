@@ -49,7 +49,8 @@ class DatabaseManager:
             UPDATE Cars 
             SET Owed_Fees = Owed_Fees + ?, 
                 Last_Seen = GETDATE(),
-                Car_Type = ?
+                Car_Type = ?,
+                Passes = Passes + 1
             WHERE License_Plate = ?;
             """
             cursor.execute(update_car_query, (fee, car_type, plate))

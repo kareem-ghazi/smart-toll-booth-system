@@ -85,7 +85,7 @@ def load_data():
         elif st.session_state.view_table == "Cars":
             df = db_manager.get_all_cars()
             if not df.empty:
-                df.columns = ["License Plate", "Type", "Brand", "Model", "Year", "Owed Fees ($)", "Owner NID", "Last Seen"]
+                df.columns = ["License Plate", "Type", "Brand", "Model", "Year", "Owed Fees ($)", "Owner NID", "Last Seen", "Passes"]
             return df
         elif st.session_state.view_table == "Drivers":
             df = db_manager.get_all_drivers()
