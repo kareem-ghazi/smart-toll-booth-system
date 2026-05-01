@@ -104,7 +104,7 @@ df = load_data()
 st.title("Smart Toll Booth Detection System")
 st.markdown("""
     This system automates toll booth operations by detecting license plates and recognizing characters in real-time. 
-    It leverages deep learning (YOLOv8) to identify vehicles, record their passage, and manage a relational database 
+    It leverages deep learning (YOLOv26n) to identify vehicles, record their passage, and manage a relational database 
     for efficient toll collection and monitoring.
 """)
 st.markdown("---")
