@@ -1,4 +1,4 @@
-# Smart Toll Booth Detection System 🛣️
+# 🛣️ Smart Toll Booth Detection System  
 
 An automated toll booth system that utilizes deep learning (YOLO) to detect vehicles and recognize license plates for seamless toll collection.
 
@@ -55,11 +55,18 @@ smart-toll-booth-system/
 │   ├── data/
 │   │   ├── processed_plates/  # Dataset for character detection & recognition
 │   │   └── processed_vehicles/ # Dataset for vehicle detection
+│   ├── test/
+│   │   ├── test_lp_model.py # Automated tests for detection model
+│   │   └── test_character_model.py # Automated tests for recognition model
 │   └── utils/
 │       ├── create_db.sql    # SQL script to initialize MS SQL tables
 │       ├── clean_db.sql     # SQL script to drop/reset tables
 │       └── dataset_splitter.py # Utility to split raw data
+├── analysis/               # Evaluation results and training metrics
 ├── assets/                 # Project diagrams and screenshots
+├── paper/                  # Research paper (PDF & DOCX)
+├── test_vehicles/          # Sample images for testing the system
+├── requirements.txt        # Python dependencies
 ├── LICENSE.txt             # Project license
 └── README.md               # You are here!
 ```
