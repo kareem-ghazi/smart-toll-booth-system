@@ -15,6 +15,31 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# --- Keyboard Shortcuts Logic ---
+st.iframe(
+    """
+<script>
+const doc = window.parent.document;
+if (!window.parent._keyboardShortcutAdded) {
+    window.parent._keyboardShortcutAdded = true;
+    doc.addEventListener('keydown', (e) => {
+        if (['INPUT', 'TEXTAREA'].includes(doc.activeElement.tagName)) return;
+        
+        if (e.key === 'ArrowLeft') {
+            const btn = Array.from(doc.querySelectorAll('button')).find(el => el.innerText.includes('Previous'));
+            if (btn) btn.click();
+        } else if (e.key === 'ArrowRight') {
+            const btn = Array.from(doc.querySelectorAll('button')).find(el => el.innerText.includes('Next'));
+            if (btn) btn.click();
+        }
+    });
+}
+</script>
+    """,
+    height=1,
+    width=1,
+)
+
 # --- Custom Styling for Padding & Alignment ---
 st.markdown("""
     <style>
