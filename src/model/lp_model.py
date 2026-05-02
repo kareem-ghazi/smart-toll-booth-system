@@ -36,7 +36,7 @@ def test_and_save_result(model, image_path, output_path):
     print(f"Running inference on {image_path}...")
     results = model(image_path)
     
-    # results is a list, take the first one
+    # Results is a list, take the first one
     res = results[0]
     
     # Plot results on the image

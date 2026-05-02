@@ -36,7 +36,7 @@ class DatabaseManager:
         except Exception as e:
             return False, f"Failed to connect: {str(e)}"
 
-    def record_passage(self, plate, car_type, fee):
+    def record_passage(self, plate, fee):
         """Records a car passage with transaction safety and debugging."""
         conn = None
         try:
@@ -49,11 +49,10 @@ class DatabaseManager:
             UPDATE Cars 
             SET Owed_Fees = Owed_Fees + ?, 
                 Last_Seen = GETDATE(),
-                Car_Type = ?,
                 Passes = Passes + 1
             WHERE License_Plate = ?;
             """
-            cursor.execute(update_car_query, (fee, car_type, plate))
+            cursor.execute(update_car_query, (fee, plate))
 
             # Record in passage log
             # Note: This will only succeed if the car exists in Cars table due to FK constraint

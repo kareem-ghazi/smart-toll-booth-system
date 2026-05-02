@@ -74,7 +74,6 @@ if 'plate_search_query' not in st.session_state:
 
 # --- Constants for Randomization ---
 FEES = [10.0, 15.0, 20.0, 25.0]
-CAR_TYPES = ["Sedan", "Off-road", "Hatchback", "Pickup", "Van", "Sport", "SUV"]
 
 # --- Database Loading Logic ---
 def load_data():
@@ -101,11 +100,18 @@ def load_data():
 df = load_data()
 
 # --- Main Title ---
-st.title("Smart Toll Booth Detection System")
+st.title("🛣️ Smart Toll Booth Detection System")
 st.markdown("""
     This system automates toll booth operations by detecting license plates and recognizing characters in real-time. 
     It leverages deep learning (YOLOv26n) to identify vehicles, record their passage, and manage a relational database 
     for efficient toll collection and monitoring.
+    
+    Features:
+
+    - **Detect Vehicles**: Identify vehicles as they approach the toll booth.
+    - **Locate License Plates**: Precisely crop license plate regions from vehicle images.
+    - **Recognize Characters**: Perform Optical Character Recognition (OCR) on the license plates to extract the plate number.
+    - **Manage Records**: Track toll transactions in a database with a user-friendly dashboard.
 """)
 st.markdown("---")
 
@@ -172,7 +178,7 @@ with left_col:
                                 'detected_text': text if text else "N/A"
                             }
                             if text:
-                                db_manager.record_passage(text, random.choice(CAR_TYPES), random.choice(FEES))
+                                db_manager.record_passage(text, random.choice(FEES))
                         else:
                             st.session_state.image_results[f.name] = {
                                 'detected_plate_img': None, 
@@ -191,7 +197,7 @@ with left_col:
                     st.session_state.plate_aspect_ratio = w / h
                     st.session_state.detected_text = text if text else "N/A"
                     if text:
-                        db_manager.record_passage(text, random.choice(CAR_TYPES), random.choice(FEES))
+                        db_manager.record_passage(text, random.choice(FEES))
                     st.rerun()
 
     # Video/Image Container

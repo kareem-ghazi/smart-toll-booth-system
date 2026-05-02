@@ -59,9 +59,6 @@ def detect_and_extract_text(model, image_path, output_path):
         })
     
     # Sort characters by x_min to read from left to right (or right to left for Arabic)
-    # Note: For Arabic, usually it is right to left, but depending on how the bounding boxes 
-    # are ordered in the labels, we might need to reverse.
-    # We will sort by x_min ascending for now.
     detected_chars.sort(key=lambda x: x['x_min'])
     
     plate_text = "".join([d['char'] for d in detected_chars])
