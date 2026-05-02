@@ -6,6 +6,7 @@ from PIL import Image
 import random
 from manager import manager
 from database import db_manager
+from streamlit.runtime.media_file_storage import MediaFileStorageError
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -190,40 +191,50 @@ with left_col:
         if uploaded_files:
             with st.spinner(f"Processing {len(uploaded_files)} images..."):
                 for f in uploaded_files:
-                    if f.type.startswith('image/'):
-                        img = Image.open(f)
-                        img_bgr = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
-                        cropped_plate, _ = manager.detect_and_crop_plate(img_bgr)
-                        if cropped_plate is not None:
-                            text = manager.extract_text_from_plate(cropped_plate)
-                            h, w = cropped_plate.shape[:2]
-                            st.session_state.image_results[f.name] = {
-                                'detected_plate_img': cv2.cvtColor(cropped_plate, cv2.COLOR_BGR2RGB),
-                                'plate_aspect_ratio': w / h,
-                                'detected_text': text if text else "N/A"
-                            }
-                            if text:
-                                db_manager.record_passage(text, random.choice(FEES))
-                        else:
-                            st.session_state.image_results[f.name] = {
-                                'detected_plate_img': None, 
-                                'detected_text': "No Plate Detected", 
-                                'plate_aspect_ratio': 3/1
-                            }
+                    try:
+                        if f.type.startswith('image/'):
+                            img = Image.open(f)
+                            img_bgr = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+                            cropped_plate, _ = manager.detect_and_crop_plate(img_bgr)
+                            if cropped_plate is not None:
+                                text = manager.extract_text_from_plate(cropped_plate)
+                                h, w = cropped_plate.shape[:2]
+                                st.session_state.image_results[f.name] = {
+                                    'detected_plate_img': cv2.cvtColor(cropped_plate, cv2.COLOR_BGR2RGB),
+                                    'plate_aspect_ratio': w / h,
+                                    'detected_text': text if text else "N/A"
+                                }
+                                if text:
+                                    success, msg = db_manager.record_passage(text, random.choice(FEES))
+                                    if not success:
+                                        st.warning(f"Plate {text} detected but record failed: {msg}")
+                            else:
+                                st.session_state.image_results[f.name] = {
+                                    'detected_plate_img': None, 
+                                    'detected_text': "No Plate Detected", 
+                                    'plate_aspect_ratio': 3/1
+                                }
+                    except Exception as e:
+                        st.error(f"Error processing {f.name}: {str(e)}")
                 st.rerun()
         elif st.session_state.captured_frame is not None:
             with st.spinner("Processing image..."):
-                img_bgr = cv2.cvtColor(st.session_state.captured_frame, cv2.COLOR_RGB2BGR)
-                cropped_plate, _ = manager.detect_and_crop_plate(img_bgr)
-                if cropped_plate is not None:
-                    text = manager.extract_text_from_plate(cropped_plate)
-                    st.session_state.detected_plate_img = cv2.cvtColor(cropped_plate, cv2.COLOR_BGR2RGB)
-                    h, w = cropped_plate.shape[:2]
-                    st.session_state.plate_aspect_ratio = w / h
-                    st.session_state.detected_text = text if text else "N/A"
-                    if text:
-                        db_manager.record_passage(text, random.choice(FEES))
-                    st.rerun()
+                try:
+                    img_bgr = cv2.cvtColor(st.session_state.captured_frame, cv2.COLOR_RGB2BGR)
+                    cropped_plate, _ = manager.detect_and_crop_plate(img_bgr)
+                    if cropped_plate is not None:
+                        text = manager.extract_text_from_plate(cropped_plate)
+                        st.session_state.detected_plate_img = cv2.cvtColor(cropped_plate, cv2.COLOR_BGR2RGB)
+                        h, w = cropped_plate.shape[:2]
+                        st.session_state.plate_aspect_ratio = w / h
+                        st.session_state.detected_text = text if text else "N/A"
+                        if text:
+                            success, msg = db_manager.record_passage(text, random.choice(FEES))
+                            if not success:
+                                st.warning(f"Plate {text} detected but record failed: {msg}")
+                        st.rerun()
+                except Exception as e:
+                    st.error(f"Capture processing error: {str(e)}")
 
     # Video/Image Container
     video_container = st.container(border=True)
@@ -338,17 +349,21 @@ with right_col:
                           label_visibility="collapsed", key="plate_search_query")
 
         if st.session_state.detected_plate_img is not None:
-            res_col1, res_col2 = st.columns([1, 1], gap="medium")
-            with res_col1:
-                st.image(st.session_state.detected_plate_img, caption="Cropped Plate", width='stretch')
-            with res_col2:
-                aspect = st.session_state.get('plate_aspect_ratio', 3/1)
-                st.markdown(f"""
-                    <div style="background:#0e1117; width:100%; aspect-ratio:{aspect}; 
-                    border-radius:12px; border:2px solid #31333f; display:flex; justify-content:center; align-items:center;">
-                        <h1 style="color:white; font-size:2.5vw; font-family:monospace; letter-spacing:0.5vw; direction:rtl;">
-                            {st.session_state.detected_text}
-                        </h1>
-                    </div>
-                    <p style="text-align:center; color:#808495; font-size:14px; margin-top:5px;">Detected Characters</p>
-                """, unsafe_allow_html=True)
+            try:
+                res_col1, res_col2 = st.columns([1, 1], gap="medium")
+                with res_col1:
+                    st.image(st.session_state.detected_plate_img, caption="Cropped Plate", width='stretch')
+                with res_col2:
+                    aspect = st.session_state.get('plate_aspect_ratio', 3/1)
+                    st.markdown(f"""
+                        <div style="background:#0e1117; width:100%; aspect-ratio:{aspect}; 
+                        border-radius:12px; border:2px solid #31333f; display:flex; justify-content:center; align-items:center;">
+                            <h1 style="color:white; font-size:2.5vw; font-family:monospace; letter-spacing:0.5vw; direction:rtl;">
+                                {st.session_state.detected_text}
+                            </h1>
+                        </div>
+                        <p style="text-align:center; color:#808495; font-size:14px; margin-top:5px;">Detected Characters</p>
+                    """, unsafe_allow_html=True)
+            except (MediaFileStorageError, Exception) as e:
+                st.error("⚠️ The license plate image could not be processed or found in the system. Please try re-uploading the media.")
+                st.info("Check if the database connection is active, as missing records can sometimes cause display issues.")

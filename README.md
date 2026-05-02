@@ -60,7 +60,8 @@ smart-toll-booth-system/
 │   │   └── test_character_model.py # Automated tests for recognition model
 │   └── utils/
 │       ├── create_db.sql    # SQL script to initialize MS SQL tables
-│       ├── clean_db.sql     # SQL script to drop/reset tables
+│       ├── clean_db.sql     # SQL script to drop tables
+│       ├── reset_data.sql   # SQL script to clear data without dropping tables
 │       └── dataset_splitter.py # Utility to split raw data
 ├── analysis/               # Evaluation results and training metrics
 ├── assets/                 # Project diagrams and screenshots
