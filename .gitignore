@@ -93,5 +93,3 @@ Thumbs.db
 src/model/runs/
 _archive/
 src/test/output/
-
-src/database.py

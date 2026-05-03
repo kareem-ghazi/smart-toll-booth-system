@@ -97,6 +97,8 @@ if 'nav_jump' not in st.session_state:
     st.session_state.nav_jump = 1
 if 'plate_search_query' not in st.session_state:
     st.session_state.plate_search_query = ""
+if 'record_error' not in st.session_state:
+    st.session_state.record_error = False
 
 # --- Constants for Randomization ---
 FEES = [10.0, 15.0, 20.0, 25.0]
@@ -202,17 +204,19 @@ with left_col:
                                 st.session_state.image_results[f.name] = {
                                     'detected_plate_img': cv2.cvtColor(cropped_plate, cv2.COLOR_BGR2RGB),
                                     'plate_aspect_ratio': w / h,
-                                    'detected_text': text if text else "N/A"
+                                    'detected_text': text if text else "N/A",
+                                    'record_error': False
                                 }
                                 if text:
                                     success, msg = db_manager.record_passage(text, random.choice(FEES))
                                     if not success:
-                                        st.warning(f"Plate {text} detected but record failed: {msg}")
+                                        st.session_state.image_results[f.name]['record_error'] = True
                             else:
                                 st.session_state.image_results[f.name] = {
                                     'detected_plate_img': None, 
                                     'detected_text': "No Plate Detected", 
-                                    'plate_aspect_ratio': 3/1
+                                    'plate_aspect_ratio': 3/1,
+                                    'record_error': False
                                 }
                     except Exception as e:
                         st.error(f"Error processing {f.name}: {str(e)}")
@@ -228,10 +232,11 @@ with left_col:
                         h, w = cropped_plate.shape[:2]
                         st.session_state.plate_aspect_ratio = w / h
                         st.session_state.detected_text = text if text else "N/A"
+                        st.session_state.record_error = False
                         if text:
                             success, msg = db_manager.record_passage(text, random.choice(FEES))
                             if not success:
-                                st.warning(f"Plate {text} detected but record failed: {msg}")
+                                st.session_state.record_error = True
                         st.rerun()
                 except Exception as e:
                     st.error(f"Capture processing error: {str(e)}")
@@ -364,6 +369,19 @@ with right_col:
                         </div>
                         <p style="text-align:center; color:#808495; font-size:14px; margin-top:5px;">Detected Characters</p>
                     """, unsafe_allow_html=True)
+                
+                # Show Error Message if record failed
+                is_error = False
+                if uploaded_files:
+                    current_file = uploaded_files[st.session_state.current_index]
+                    if current_file.name in st.session_state.image_results:
+                        is_error = st.session_state.image_results[current_file.name].get('record_error', False)
+                elif st.session_state.captured_frame is not None:
+                    is_error = st.session_state.record_error
+                
+                if is_error:
+                    st.warning("This license plate was not processed successfully as it does not exist in the database records!")
+                    
             except (MediaFileStorageError, Exception) as e:
                 st.error("⚠️ The license plate image could not be processed or found in the system. Please try re-uploading the media.")
                 st.info("Check if the database connection is active, as missing records can sometimes cause display issues.")
